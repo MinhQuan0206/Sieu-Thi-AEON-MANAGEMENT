@@ -1,0 +1,157 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Trang_chu_Main_Page_.DSHangHoa_Dat
+{
+    public partial class HangHoaNCC : UserControl
+    {
+        public int SoLuong
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(txtSoLuong.Text))
+                {
+                    return 1;
+                }
+                if (int.TryParse(txtSoLuong.Text, out int result) && result > 0)
+                {
+                    return result;
+                }
+                else
+                {
+                    if (Thread.CurrentThread.CurrentUICulture.Name == "vi-VN")
+                    {
+                        MessageBox.Show("Bạn vui lòng hãy nhập số nguyên dương lớn hơn 0, không có ký tự đặc biệt hoặc chữ cái.",
+                                        "Thông báo",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Warning);
+                    }
+                    else if (Thread.CurrentThread.CurrentUICulture.Name == "en-US")
+                    {
+                        MessageBox.Show("Please enter a positive integer greater than 0, without special characters or letters.",
+                                        "Notification",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Warning);
+                    }
+
+                    return 0; 
+                }
+            }
+        }
+
+
+        public event EventHandler OnSelect = null;
+        private double cost;
+        public HangHoaNCC()
+        {
+            InitializeComponent();
+            this.imgImage.Paint += new System.Windows.Forms.PaintEventHandler(this.imgImage_Paint);
+
+        }
+
+        public string MaHH
+        {
+            get => label2.Text; 
+            set => label2.Text = value;
+        }
+
+        public string DanhMuc
+        {
+            get => lbDanhMuc.Text;
+            set => lbDanhMuc.Text = value;
+        }
+        public string Title //label1
+        {
+            get => label1.Text;
+            set => label1.Text = value;
+        }
+
+        public double Cost // label4
+        {
+            get => cost;
+            set
+            {
+                cost = value;
+                label4.Text = cost.ToString("#,##0") + "đ";
+            }
+        }
+
+        public string Supplier //label3
+        {
+            get => label3.Text;
+            set => label3.Text = value;
+        }
+        public object Icon
+        {
+            get => imgImage.Image;
+            set
+            {
+                if (value is byte[] imgData)
+                {
+                    using (MemoryStream ms = new MemoryStream(imgData))
+                    {
+                        imgImage.Image = Image.FromStream(ms);
+                    }
+                }
+                else if (value is Image img)
+                {
+                    imgImage.Image = img;
+                }
+                else
+                {
+                    throw new ArgumentException("Dữ liệu không hợp lệ. Phải là Image hoặc byte[].");
+                }
+            }
+        }
+
+
+
+
+        private void UserControl1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void guna2PictureBox1_Click(object sender, EventArgs e)
+        {
+            OnSelect?.Invoke(this, e);
+        }
+        private void imgImage_Paint(object sender, PaintEventArgs e)
+        {
+            int radius = 15; // Bán kính bo tròn cho 4 góc là 5
+            GraphicsPath gp = new GraphicsPath();
+
+            // Góc trên trái
+            gp.AddArc(0, 0, radius * 2, radius * 2, 180, 90);
+            // Góc trên phải
+            gp.AddArc(imgImage.Width - radius * 2, 0, radius * 2, radius * 2, 270, 90);
+            // Góc dưới phải
+            gp.AddArc(imgImage.Width - radius * 2, imgImage.Height - radius * 2, radius * 2, radius * 2, 0, 90);
+            // Góc dưới trái
+            gp.AddArc(0, imgImage.Height - radius * 2, radius * 2, radius * 2, 90, 90);
+
+            gp.CloseFigure(); // Đóng đường dẫn thành một hình liên tục
+            imgImage.Region = new Region(gp); // Áp dụng vùng bo tròn cho PictureBox
+        }
+
+        private void txtSoLuong_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtSoLuong_TextChanged_1(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
